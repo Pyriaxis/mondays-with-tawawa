@@ -1,12 +1,15 @@
+require('dotenv').config();
+
 const TeleBot = require('telebot');
 const Twitter = require('twitter');
+
 
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 
 const bot = new TeleBot({
-    token: '@tobefilled',
+    token: process.env.TELEGRAM_TOKEN,
     pooling: { // Optional. Use pooling.
         interval: 1000, // Optional. How often check updates (in ms).
         timeout: 0, // Optional. Update pulling timeout (0 - short polling).
@@ -16,10 +19,10 @@ const bot = new TeleBot({
 });
 
 const client = new Twitter({
-    consumer_key: '@tobefilled',
-    consumer_secret: '@tobefilled',
-    access_token_key: '@tobefilled',
-    access_token_secret: '@tobefilled',
+    consumer_key: process.env.TWITTER_CONS_KEY,
+    consumer_secret: process.env.TWITTER_CONS_SECRET,
+    access_token_key: process.env.TWITTER_ACCESS_KEY,
+    access_token_secret: process.env.TWITTER_ACCESS_SECRET,
 })
 
 var CronJob = require('cron').CronJob;

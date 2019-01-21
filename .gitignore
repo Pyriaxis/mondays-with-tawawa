@@ -29,4 +29,5 @@ node_modules
 # IDE Directory
 .idea
 
-keys
+#dotenv
+.env

@@ -11,6 +11,7 @@
   "dependencies": {
     "bluebird": "latest",
     "cron": "^1.1.0",
+    "dotenv": "^6.2.0",
     "lodash": "^4.13.1",
     "request": "^2.83.0",
     "telebot": "1.0.6",
