@@ -1,21 +1,14 @@
 require('dotenv').config();
-
-const TeleBot = require('telebot');
+const Telegraf = require('telegraf');
 const Twitter = require('twitter');
-
-
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 
-const bot = new TeleBot({
-    token: process.env.TELEGRAM_TOKEN,
-    pooling: { // Optional. Use pooling.
-        interval: 1000, // Optional. How often check updates (in ms).
-        timeout: 0, // Optional. Update pulling timeout (0 - short polling).
-        limit: 100, // Optional. Limits the number of updates to be retrieved.
-        retryTimeout: 5000 // Optional. Reconnecting timeout (in ms).
-    }
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
+
+bot.telegram.getMe().then((botInfo) => {
+    bot.options.username = botInfo.username
 });
 
 const client = new Twitter({
@@ -23,7 +16,7 @@ const client = new Twitter({
     consumer_secret: process.env.TWITTER_CONS_SECRET,
     access_token_key: process.env.TWITTER_ACCESS_KEY,
     access_token_secret: process.env.TWITTER_ACCESS_SECRET,
-})
+});
 
 var CronJob = require('cron').CronJob;
 
@@ -36,7 +29,6 @@ function searchAndSend(){
     console.log('Search and Send!');
     client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
     .then(function(response){
-
         var subscribers = fs.readFileSync(path.join(__dirname + '/tawawa', 'subscribers'), 'utf8').split([' ']);
         for (var i = 0; i < subscribers.length - 1; i++){
             bot.sendMessage(subscribers[i], response.statuses[0].text);
@@ -84,12 +76,14 @@ function subscribe(cid, chattitle){
  *         BOT COMMANDS
  ************************************/
 
+bot.use((ctx, next) => {
+    console.log(ctx.message)
+    return next();
+});
 
-bot.on('/start', function(msg) {
 
-    var chatId = msg.chat.id;
-
-    return bot.sendMessage(chatId, 'Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
+bot.start((ctx) => {
+    ctx.reply('Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
         'I deliver weekly editions of Getsuyoubi no Tawawa automatically!' +
         '\n\nYou can interact with me by sending me these commands:' +
         '\n\n/help - Display this message.' +
@@ -97,7 +91,7 @@ bot.on('/start', function(msg) {
         '\n/subscribe - Get an automated update every Monday!')
 });
 
-bot.on('/subscribe', function(msg) {
+bot.command('/subscribe', (ctx)=>{
     var chatId = msg.chat.id;
     var chatTitle = msg.chat.title || "";
 
@@ -116,19 +110,13 @@ bot.on('/subscribe', function(msg) {
 //     }
 // });
 
-bot.on('/debug', function(msg){
-
-    console.log(msg);
-    var chatId = msg.chat.id;
-    return bot.sendMessage(chatId, "Debug: ID of chat = " + chatId.toString());
-
+bot.command('/debug', (ctx)=>{
+    console.log(ctx.message);
+    ctx.reply("Debug: ID of chat = " + ctx.chat.id.toString());
 })
 
-bot.on('/help', function(msg){
-
-    var chatId = msg.chat.id;
-
-    return bot.sendMessage(chatId, 'Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
+bot.help((ctx)=>{
+    return ctx.reply('Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
         'I deliver weekly editions of Getsuyoubi no Tawawa automatically!' +
         '\n\nYou can interact with me by sending me these commands:' +
         '\n\n/help - Display this message.' +
@@ -136,17 +124,17 @@ bot.on('/help', function(msg){
         '\n/subscribe - Get an automated update every Monday!')
 });
 
-bot.on('/latest', function(msg){
 
+bot.command('/latest', (ctx)=>{
     client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
     .then(function(response){
-        bot.sendMessage(msg.chat.id, response.statuses[0].text);
-        //bot.sendPhoto(msg.chat.id, response.statuses[0].entities.media[0].media_url);
+        console.log(response);
+        ctx.reply(response.statuses[0].text);
     });
 });
+//
+// bot.on('/broadcast', function(msg){
+//     searchAndSend();
+// });
 
-bot.on('/broadcast', function(msg){
-    searchAndSend();
-});
-
-bot.connect();
+bot.launch();
