@@ -1,0 +1,19 @@
+{
+  "name": "webcomic_bot",
+  "version": "1.0.2",
+  "description": "Webcomic bot to fetch a variety of webcomics - tawawa edition.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "latest",
+    "cron": "^1.1.0",
+    "lodash": "^4.13.1",
+    "request": "^2.83.0",
+    "telebot": "1.0.6",
+    "twitter": "^1.7.1"
+  }
+}
