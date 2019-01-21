@@ -1,6 +1,6 @@
 #volume to mount is tawawa
 
-FROM mhart/alpine-node:6
+FROM mhart/alpine-node:10.15
 
 WORKDIR /usr/src/app
 
