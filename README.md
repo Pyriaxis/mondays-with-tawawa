@@ -1,7 +1,9 @@
-# nodejs-nerfnow-telegrambot
-Telegram bot in NodeJS to serve nerf now comics.
+# mondays-with-tawawa
+Telegram bot in NodeJS to serve Getsuyoubi no Tawawa. (月曜日のたわわ)
 
-Simple Bot written in NodeJS with Telebot to scrape Strangestone's Tweets and get the latest Getsuyoubi no Tawawa.
+Simple Bot written in NodeJS to scrape Strangestone's Tweets and get the latest Getsuyoubi no Tawawa and deliver them to subscribed telegram groups.
+
+Rewriting with Telegraf and ES6 practices, including testing.
 
 To use, build the image with Docker.
 
