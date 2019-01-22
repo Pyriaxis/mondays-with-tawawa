@@ -1,24 +1,20 @@
 require('dotenv').config();
 const Telegraf = require('telegraf');
-const Twitter = require('twitter');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const util = require('util');
 
+const TawawaTwitter = require('./util/twitter.js');
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
 });
 
-const client = new Twitter({
-    consumer_key: process.env.TWITTER_CONS_KEY,
-    consumer_secret: process.env.TWITTER_CONS_SECRET,
-    access_token_key: process.env.TWITTER_ACCESS_KEY,
-    access_token_secret: process.env.TWITTER_ACCESS_SECRET,
-});
+let tawawaTwitter = new TawawaTwitter();
 
-var CronJob = require('cron').CronJob;
+let CronJob = require('cron').CronJob;
 
 new CronJob('0 55 8 * * 1', function() {
     console.log("Cron Update Fired!");
@@ -27,7 +23,7 @@ new CronJob('0 55 8 * * 1', function() {
 
 function searchAndSend(){
     console.log('Search and Send!');
-    client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
+    tawawaTwitter.client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
     .then(function(response){
         var subscribers = fs.readFileSync(path.join(__dirname + '/tawawa', 'subscribers'), 'utf8').split([' ']);
         for (var i = 0; i < subscribers.length - 1; i++){
@@ -125,12 +121,11 @@ bot.help((ctx)=>{
 });
 
 
-bot.command('/latest', (ctx)=>{
-    client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
-    .then(function(response){
-        console.log(response);
-        ctx.reply(response.statuses[0].text);
-    });
+bot.command('/latest', async (ctx)=>{
+    ctx.reply((await tawawaTwitter.latest).text);
+    //tawawaTwitter.client.get('tweets/search/fullarchive/dev', {
+    //    query: '月曜日のたわわ from:Strangestone to:Strangestone'
+    //})
 });
 //
 // bot.on('/broadcast', function(msg){

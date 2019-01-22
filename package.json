@@ -13,10 +13,11 @@
     "bluebird": "latest",
     "cron": "^1.1.0",
     "dotenv": "^6.2.0",
+    "firebase": "^5.8.0",
     "lodash": "^4.13.1",
     "request": "^2.83.0",
     "telegraf": "^3.26.0",
-    "twitter": "^1.7.1"
+    "twitter-lite": "^0.9.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
