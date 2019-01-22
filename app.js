@@ -6,6 +6,8 @@ const _ = require('lodash');
 const util = require('util');
 
 const TawawaTwitter = require('./util/twitter.js');
+const TawawaFirebase = require('./util/firebase');
+
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
 bot.telegram.getMe().then((botInfo) => {
@@ -13,6 +15,7 @@ bot.telegram.getMe().then((botInfo) => {
 });
 
 let tawawaTwitter = new TawawaTwitter();
+let tawawaFirebase = new TawawaFirebase();
 
 let CronJob = require('cron').CronJob;
 
@@ -32,48 +35,14 @@ function searchAndSend(){
     });
 }
 
-function subscribe(cid, chattitle){
-    var subscribers = fs.readFileSync(path.join(__dirname + '/tawawa', 'subscribers'), 'utf8').split([' ']);
-    console.log(subscribers);
-    console.log(cid.toString());
 
-    if (subscribers.indexOf(cid.toString()) == -1){
-        fs.appendFileSync(path.join(__dirname + '/tawawa', 'subscribers'), cid + ' ');
-        if (chattitle === "")
-        {
-            return bot.sendMessage(cid, 'You have successfully subscribed to Getsuyoubi no Tawawa');
-        }
-        else {
-            return bot.sendMessage(cid, chattitle + " has been subscribed to Getsuyoubi no Tawawa");
-        }
-    } else {
-        return bot.sendMessage(cid, 'Already subscribed.');
-    }
-}
-
-// function unsubscribe(cid, chattitle){
-//     subscribers.findOneAndUpdate({key: comicname},{$pull: {subscribers: cid}}, {upsert: true}, function(err,doc){
-//         if (err) {
-//             console.log(err);
-//             return bot.sendMessage(cid, 'DB Error!');
-//         } else {
-//             if (chattitle === "")
-//             {
-//                 return bot.sendMessage(cid, 'You have successfully unsubscribed from the webcomic ' + comicname +'!');
-//             }
-//             else{
-//                 return bot.sendMessage(cid, chattitle + " has been unsubscribed from the webcomic " + comicname + '!');
-//             }
-//         }
-//     });
-// }
 
 /************************************
  *         BOT COMMANDS
  ************************************/
 
 bot.use((ctx, next) => {
-    console.log(ctx.message)
+    console.log(ctx.message);
     return next();
 });
 
@@ -87,11 +56,31 @@ bot.start((ctx) => {
         '\n/subscribe - Get an automated update every Monday!')
 });
 
-bot.command('/subscribe', (ctx)=>{
-    var chatId = msg.chat.id;
-    var chatTitle = msg.chat.title || "";
+bot.command('/subscribe', async (ctx)=>{
+    let isSubscribed = await tawawaFirebase.getSubscriber(ctx.chat.id);
+    if (isSubscribed) return ctx.reply('This chat is already subscribed!');
 
-    return subscribe(chatId, chatTitle)
+    tawawaFirebase.subscribe(ctx.chat);
+
+    if (ctx.chat.type === 'group'){
+        return ctx.replyWithMarkdown(`*${ctx.chat.title}* is now subscribed to \`Tawawa on Mondays\`!`);
+    } else {
+        return ctx.replyWithMarkdown(`You are now subscribed to \`Tawawa on Mondays\`!`);
+    }
+});
+
+bot.command('/unsubscribe', async (ctx)=>{
+    let isSubscribed = await tawawaFirebase.getSubscriber(ctx.chat.id);
+    console.log(isSubscribed);
+    if (!isSubscribed) return ctx.replyWithMarkdown(`This chat is not currently subscribed to \`Tawawa on Mondays\`.`);
+
+    tawawaFirebase.unsubscribe(ctx.chat);
+
+    if (ctx.chat.type === 'group'){
+        return ctx.replyWithMarkdown(`*${ctx.chat.title}* is now unsubscribed from \`Tawawa on Mondays\`.`);
+    } else {
+        return ctx.replyWithMarkdown(`You are now unsubscribed from \`Tawawa on Mondays\`.`);
+    }
 });
 
 // bot.on('/unsubscribe', function(msg) {
@@ -122,10 +111,12 @@ bot.help((ctx)=>{
 
 
 bot.command('/latest', async (ctx)=>{
-    ctx.reply((await tawawaTwitter.latest).text);
-    //tawawaTwitter.client.get('tweets/search/fullarchive/dev', {
-    //    query: '月曜日のたわわ from:Strangestone to:Strangestone'
-    //})
+    let postArray = await tawawaTwitter.smallFetch();
+
+    await tawawaFirebase.populate(postArray);
+    let latestPost = await tawawaFirebase.getLatest();
+
+    ctx.reply(latestPost.full);
 });
 //
 // bot.on('/broadcast', function(msg){
