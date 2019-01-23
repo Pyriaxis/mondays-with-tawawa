@@ -11,7 +11,7 @@ const TawawaFirebase = require('./util/firebase');
 const ListHandler = require('./list');
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-bot.telegram.setWebhook('https://mondays-with-tawawa.herokuapp.com:5000/webhook-mon-w-tawawa');
+bot.telegram.setWebhook('https://mondays-with-tawawa.herokuapp.com:8443/webhook-mon-w-tawawa');
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
