@@ -1,5 +1,7 @@
 require('dotenv').config();
 const Telegraf = require('telegraf');
+const Markup = require('telegraf/markup');
+
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -7,6 +9,7 @@ const util = require('util');
 
 const TawawaTwitter = require('./util/twitter.js');
 const TawawaFirebase = require('./util/firebase');
+const ListHandler = require('./list');
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
@@ -36,16 +39,15 @@ function searchAndSend(){
 }
 
 
-
 /************************************
  *         BOT COMMANDS
  ************************************/
-
 bot.use((ctx, next) => {
     console.log(ctx.message);
     return next();
 });
 
+ListHandler.init(bot, tawawaFirebase);
 
 bot.start((ctx) => {
     ctx.reply('Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
@@ -83,22 +85,10 @@ bot.command('/unsubscribe', async (ctx)=>{
     }
 });
 
-// bot.on('/unsubscribe', function(msg) {
-//     var chatId = msg.chat.id;
-//     var chatTitle = msg.chat.title || "";
-//
-//     var comicname = msg.text.split('/unsubscribe ')[1];
-//     if (repos.hasOwnProperty(comicname)){
-//         return unsubscribe(chatId, chatTitle, comicname)
-//     } else {
-//         return bot.sendMessage(chatId, 'Sorry, you have specified an invalid webcomic. Use /list to see a list of supported webcomics.');
-//     }
-// });
-
 bot.command('/debug', (ctx)=>{
     console.log(ctx.message);
     ctx.reply("Debug: ID of chat = " + ctx.chat.id.toString());
-})
+});
 
 bot.help((ctx)=>{
     return ctx.reply('Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
@@ -109,6 +99,10 @@ bot.help((ctx)=>{
         '\n/subscribe - Get an automated update every Monday!')
 });
 
+bot.command('/largefetch', async (ctx)=>{
+    let postArray = await tawawaTwitter.largeFetch();
+    await tawawaFirebase.populate(postArray);
+});
 
 bot.command('/latest', async (ctx)=>{
     let postArray = await tawawaTwitter.smallFetch();
@@ -118,6 +112,7 @@ bot.command('/latest', async (ctx)=>{
 
     ctx.reply(latestPost.full);
 });
+
 //
 // bot.on('/broadcast', function(msg){
 //     searchAndSend();

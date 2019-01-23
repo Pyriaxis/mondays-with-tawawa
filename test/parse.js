@@ -58,4 +58,8 @@ describe('jpNumeralConversion', function(){
        expect(jpUtil.convertJpToInt('２７４８３')).to.equal(27483);
        expect(jpUtil.convertJpToInt('０００')).to.equal(0);
    });
+
+   it('reverse test', function(){
+       expect(jpUtil.convertIntToJp(1234567890)).to.equal('１２３４５６７８９０');
+   })
 });

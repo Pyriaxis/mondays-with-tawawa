@@ -55,6 +55,30 @@ class TawawaFirebase{
             });
             return retObj;
         })
+    };
+
+    getEarliest(){
+        return this.comics.orderByKey().limitToFirst(1).once("value").then(snaps =>{
+            let retObj = {};
+            snaps.forEach(function(snap) {
+                retObj = snap.val();
+                return true;
+            });
+            return retObj;
+        })
+    };
+
+    getPostsAtIndex(index, numPosts = 1){
+        index = index.toString();
+        return this.comics.orderByKey().endAt(index).limitToLast(numPosts).once("value").then(snaps =>{
+            let retArray = [];
+            let retObj = {};
+            snaps.forEach(function(snap) {
+                retObj = snap.val();
+                retArray.push(retObj);
+            });
+            return retArray;
+        })
     }
 }
 
