@@ -1,4 +1,4 @@
-//require('dotenv').config();
+console.log(process.env.TELEGRAM_TOKEN);
 const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 
@@ -11,7 +11,6 @@ const TawawaTwitter = require('./util/twitter.js');
 const TawawaFirebase = require('./util/firebase');
 const ListHandler = require('./list');
 
-console.log(process.env.TELEGRAM_TOKEN);
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
 bot.telegram.getMe().then((botInfo) => {
