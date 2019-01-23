@@ -90,6 +90,22 @@ bot.command('/debug', (ctx)=>{
     ctx.reply("Debug: ID of chat = " + ctx.chat.id.toString());
 });
 
+bot.command(['/grab', '/fetch', '/get'], async (ctx)=>{
+    let numberRegex = /(\d+)/g;
+    let num = ctx.message.text.match(numberRegex);
+
+    if (num !== null){
+        let postsArray = await tawawaFirebase.getPostsAtIndex(num[0]);
+        if (postsArray.length === 0){
+            ctx.reply(`Sorry, comic no. ${num[0]} not found in the database. It may not have been archived yet.`);
+        } else {
+            ctx.reply(postsArray[0].full);
+        }
+    } else {
+        ctx.replyWithMarkdown(`*/grab, /fetch, /get <number>* to display a specific Tawawa comic.`);
+    }
+});
+
 bot.help((ctx)=>{
     return ctx.reply('Hi there! I\'m the WebComic bot (Tawawa Branch)! ' +
         'I deliver weekly editions of Getsuyoubi no Tawawa automatically!' +
@@ -112,10 +128,5 @@ bot.command('/latest', async (ctx)=>{
 
     ctx.reply(latestPost.full);
 });
-
-//
-// bot.on('/broadcast', function(msg){
-//     searchAndSend();
-// });
 
 bot.launch();
