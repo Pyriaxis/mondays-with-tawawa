@@ -10,8 +10,12 @@ const TawawaTwitter = require('./util/twitter.js');
 const TawawaFirebase = require('./util/firebase');
 const ListHandler = require('./list');
 
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-bot.telegram.setWebhook('https://mondays-with-tawawa.herokuapp.com:8443/webhook-mon-w-tawawa');
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const PORT = process.env.port || 5000;
+const URL = process.env.url || 'https://mondays-with-tawawa.herokuapp.com';
+
+const bot = new Telegraf(TELEGRAM_TOKEN);
+bot.telegram.setWebhook(`${URL}/bot${TELEGRAM_TOKEN}`);
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
@@ -129,5 +133,5 @@ bot.command('/latest', async (ctx)=>{
     ctx.reply(latestPost.full);
 });
 
-bot.startWebhook('/webhook-mon-w-tawawa', null, 5000);
+bot.startWebhook(`/bot${TELEGRAM_TOKEN}`, null, PORT);
 //bot.launch();
