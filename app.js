@@ -14,8 +14,8 @@ const TawawaFirebase = require('./util/firebase');
 const ListHandler = require('./list');
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-const PORT = process.env.port;
-const URL = process.env.url || 'https://mondays-with-tawawa.herokuapp.com';
+const PORT = process.env.PORT;
+const URL = process.env.URL || 'https://mondays-with-tawawa.herokuapp.com';
 
 const bot = new Telegraf(TELEGRAM_TOKEN);
 bot.telegram.setWebhook(`${URL}/bot${TELEGRAM_TOKEN}`);
