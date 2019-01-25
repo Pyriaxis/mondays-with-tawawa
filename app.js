@@ -19,6 +19,7 @@ const URL = process.env.url || 'https://mondays-with-tawawa.herokuapp.com';
 
 const bot = new Telegraf(TELEGRAM_TOKEN);
 bot.telegram.setWebhook(`${URL}/bot${TELEGRAM_TOKEN}`);
+expressApp.use(bot.webhookCallback(`/bot${TELEGRAM_TOKEN}`));
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
