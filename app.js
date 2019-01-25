@@ -1,6 +1,9 @@
 const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 
+const express = require('express');
+const expressApp = express();
+
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -11,7 +14,7 @@ const TawawaFirebase = require('./util/firebase');
 const ListHandler = require('./list');
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-const PORT = process.env.port || 5000;
+const PORT = process.env.port || 3000;
 const URL = process.env.url || 'https://mondays-with-tawawa.herokuapp.com';
 
 const bot = new Telegraf(TELEGRAM_TOKEN);
@@ -133,5 +136,10 @@ bot.command('/latest', async (ctx)=>{
     ctx.reply(latestPost.full);
 });
 
-bot.startWebhook(`/bot${TELEGRAM_TOKEN}`, null, PORT);
-//bot.launch();
+expressApp.get('/', (req,res) => {
+   res.send('Hello from Tawawa!');
+});
+
+expressApp.listen(PORT, ()=>{
+   console.log(`Server running on port ${PORT}`);
+});
