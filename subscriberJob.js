@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const Promise = require('bluebird');
 const Telegram = require('telegraf/telegram');
 const telegram = new Telegram(process.env.TELEGRAM_TOKEN);
