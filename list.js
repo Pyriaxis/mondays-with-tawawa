@@ -16,7 +16,7 @@ const ListHandler = {
             await this.updateIndexes();
             let markupArray = await this.generateMarkupArray(this.latest, 5);
 
-            ctx.reply('Inline keyboard',
+            ctx.reply('Select a comic from the list:',
                 Markup.inlineKeyboard(markupArray, wrapMarkup).extra()
             );
         });
