@@ -20,25 +20,6 @@ bot.telegram.getMe().then((botInfo) => {
 let tawawaTwitter = new TawawaTwitter();
 let tawawaFirebase = new TawawaFirebase();
 
-let CronJob = require('cron').CronJob;
-
-new CronJob('0 55 8 * * 1', function() {
-    console.log("Cron Update Fired!");
-    searchAndSend();
-},null,true,'Asia/Singapore');
-
-function searchAndSend(){
-    console.log('Search and Send!');
-    tawawaTwitter.client.get('search/tweets', {q: '月曜日のたわわ from:Strangestone to:Strangestone'})
-    .then(function(response){
-        var subscribers = fs.readFileSync(path.join(__dirname + '/tawawa', 'subscribers'), 'utf8').split([' ']);
-        for (var i = 0; i < subscribers.length - 1; i++){
-            bot.sendMessage(subscribers[i], response.statuses[0].text);
-        }
-    });
-}
-
-
 /************************************
  *         BOT COMMANDS
  ************************************/
@@ -54,7 +35,9 @@ bot.start((ctx) => {
         'I deliver weekly editions of Getsuyoubi no Tawawa automatically!' +
         '\n\nYou can interact with me by sending me these commands:' +
         '\n\n/help - Display this message.' +
-        '\n/latest comic - Get the latest Tawawa comic.' +
+        '\n/latest - Get the latest Tawawa comic.' +
+        '\n/get <number> - Show the numbered comic' +
+        '\n/list - Show a list of all archived comics' +
         '\n/subscribe - Get an automated update every Monday!')
 });
 
@@ -111,14 +94,16 @@ bot.help((ctx)=>{
         'I deliver weekly editions of Getsuyoubi no Tawawa automatically!' +
         '\n\nYou can interact with me by sending me these commands:' +
         '\n\n/help - Display this message.' +
-        '\n/latest comic - Get the latest Tawawa comic.' +
+        '\n/latest - Get the latest Tawawa comic.' +
+        '\n/get <number> - Show the numbered comic' +
+        '\n/list - Show a list of all archived comics' +
         '\n/subscribe - Get an automated update every Monday!')
 });
 
-bot.command('/largefetch', async (ctx)=>{
-    let postArray = await tawawaTwitter.largeFetch();
-    await tawawaFirebase.populate(postArray);
-});
+// bot.command('/largefetch', async (ctx)=>{
+//     let postArray = await tawawaTwitter.largeFetch();
+//     await tawawaFirebase.populate(postArray);
+// });
 
 bot.command('/latest', async (ctx)=>{
     let postArray = await tawawaTwitter.smallFetch();
