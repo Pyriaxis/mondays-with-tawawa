@@ -42,6 +42,12 @@ class TawawaFirebase{
         });
     }
 
+    getSubscribers(){
+        return this.subscribers.once("value").then(snap=>{
+            return snap.val();
+        });
+    }
+
     /**
      * @param posts
      * post - [ full text, number, title, url ]
