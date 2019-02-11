@@ -10,6 +10,9 @@ let tawawaTwitter = new TawawaTwitter();
 let tawawaFirebase = new TawawaFirebase();
 
 async function getLatestAndSend(){
+    let day = (new Date()).getDay();
+    if (day !== 1) return; //not monday
+
     let oldLatest = await tawawaFirebase.getLatest();
     let postArray = await tawawaTwitter.smallFetch();
 
