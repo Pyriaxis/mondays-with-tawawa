@@ -1,5 +1,6 @@
 # mondays-with-tawawa
 Telegram bot in NodeJS to serve Getsuyoubi no Tawawa. (月曜日のたわわ)
+Try it live @GnTawawaBot
 
 Simple Bot written in NodeJS to scrape Strangestone's Tweets and get the latest Getsuyoubi no Tawawa and deliver them to subscribed telegram groups.
 
